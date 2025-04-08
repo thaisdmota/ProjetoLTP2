@@ -1,11 +1,10 @@
 package projeto1;
 
-import java.time.LocalDate;
+import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 
-abstract class Cliente {
+class Cliente {
     String nome;
     String telefone;
     String email;
@@ -19,149 +18,192 @@ class ClienteEstrangeiro extends Cliente {
     String passaporte;
 }
 
-enum TipoPacote {
-    AVENTURA, LUXO, CULTURAL
-}
-
-abstract class PacoteViagem {
-    String nomePacote;
+class Pacote {
+    String nome;
     String destino;
-    int duracaoDias;
-    double precoBase;
-    double precocacrescimo;
-    TipoPacote tipo;
+    double valorPassagem;
+    double valorDiaria;
 
-    public double calcularPrecoFinal() {
-        double acrescimo = switch (tipo) {
-            case AVENTURA -> 1.2;
-            case LUXO -> 1.4;
-            case CULTURAL -> 1.1;
-        };
-        return precocacrescimo = precoBase * acrescimo;
-    }
-}
-
-abstract class ServicosAdicionais {
-    String descricao;
-    double preco;
-}
-
-class Transfer extends ServicosAdicionais {
-    String origem;
-    String destino;
-}
-
-class Passeio extends ServicosAdicionais {
-    String local;
-    int duracaoHoras;
-}
-
-class AluguelCarro extends ServicosAdicionais {
-    String tipoVeiculo;
-    int dias;
-}
-
-class Reserva {
-    Cliente cliente;
-    PacoteViagem pacote;
-    List<ServicosAdicionais> servicos;
-    LocalDate data;
-
-    public Reserva(Cliente cliente, PacoteViagem pacote, List<ServicosAdicionais> servicos) {
-        this.cliente = cliente;
-        this.pacote = pacote;
-        this.servicos = servicos;
-        this.data = LocalDate.now();
+    public Pacote(String nome, String destino, double passagem, double diaria) {
+        this.nome = nome;
+        this.destino = destino;
+        this.valorPassagem = passagem;
+        this.valorDiaria = diaria;
     }
 
-    public void exibirResumo() {
-        System.out.println("\nCliente: " + cliente.nome);
-        System.out.println("Pacote: " + pacote.nomePacote + " - " + pacote.destino);
-        System.out.println("Duração: " + pacote.duracaoDias + " dias");
-        System.out.println("Preço do pacote: R$ " + pacote.calcularPrecoFinal());
-
-        double totalServicos = 0;
-        if (servicos == null || servicos.isEmpty()) {
-            System.out.println("Não há serviços adicionais.");
-        } else {
-            System.out.println("Serviços Adicionais:");
-            for (ServicosAdicionais s : servicos) {
-                System.out.println("- " + s.descricao + " | R$ " + s.preco);
-                totalServicos += s.preco;
-            }
-        }
-
-        double precoTotal = pacote.calcularPrecoFinal() + totalServicos;
-        System.out.println("Preço de serviços adicionais: " +totalServicos);
-        System.out.println("Valor total da reserva: R$ " + precoTotal);
+    public String toString() {
+        return nome + " - Destino: " + destino + " | Passagem: R$" + valorPassagem + " | Diária: R$" + valorDiaria;
     }
 }
 
 public class AgenciaViagens {
+    static List<Cliente> clientes = new ArrayList<>();
+    static List<Pacote> pacotes = new ArrayList<>();
+    
+    public static void main(String[] args) {
+        // Pacotes pré-definidos
 
-    static Map<String, Reserva> reservasPorCliente = new HashMap<>();
+        pacotes.add(new Pacote("Rio de Janeiro", "Rio de Janeiro-RJ", 1000.00, 500.00));
+        pacotes.add(new Pacote("Amazônia", "Manaus-AM", 1200.00, 450.00));
+        pacotes.add(new Pacote("Salvador", "Salvador-BA", 900.00, 400.00));
+        pacotes.add(new Pacote("Lençóis Maranhenses", "Maranhão-MA", 1000.00, 450.00));
+        pacotes.add(new Pacote ("São Paulo", "São Paulo-SP", 950.00, 400.00));
+        pacotes.add(new Pacote("Brasília", "Brasília-DF", 900.00, 550.00));
+        pacotes.add(new Pacote ("Belo Horizonte", "Belo Horizonte-MG", 1000.00, 500.00));
+        while (true) {
+            String[] opcoes = {"Clientes", "Pacotes", "Sair"};
+            int escolha = JOptionPane.showOptionDialog(null, "Menu Principal", "Agência de Viagens",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opcoes, opcoes[0]);
 
-    public static void buscarReservaPorNomeCliente(String nome) {
-        Reserva reserva = reservasPorCliente.get(nome);
-        if (reserva != null) {
-            System.out.println("\nReserva encontrada para: " + nome);
-            reserva.exibirResumo();
-        } else {
-            System.out.println("\nNenhuma reserva encontrada para o cliente: " + nome);
+            if (escolha == 0) {
+                menuClientes();
+            } else if (escolha == 1) {
+                menuPacotes();
+            } else {
+                break;
+            }
         }
     }
 
-    public static void main(String[] args) {
+    static void menuClientes() {
+        String[] opcoes = {"Cadastrar", "Visualizar", "Voltar"};
+        int escolha = JOptionPane.showOptionDialog(null, "Menu Clientes", "Clientes",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opcoes, opcoes[0]);
 
-        // Cliente 1
-        ClienteNacional cliente1 = new ClienteNacional();
-        cliente1.nome = "Thaís da Mota";
-        cliente1.telefone = "061900000000";
-        cliente1.email = "thais.dmota@sempreceub.com";
-        cliente1.cpf = "00000000000";
+        if (escolha == 0) {
+            String[] tipoCliente = {"Nacional", "Estrangeiro"};
+            int tipo = JOptionPane.showOptionDialog(null, "Você é cliente nacional ou estrangeiro? ", "Cadastro",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, tipoCliente, tipoCliente[0]);
 
-        PacoteViagem pacote1 = new PacoteViagem() {};
-        pacote1.nomePacote = "Férias no Brasil";
-        pacote1.destino = "Rio de Janeiro";
-        pacote1.duracaoDias = 7;
-        pacote1.precoBase = 9200.00;
-        pacote1.tipo = TipoPacote.LUXO;
+            Cliente cliente;
+            if (tipo == 0) {
+                cliente = new ClienteNacional();
+                ((ClienteNacional) cliente).cpf = JOptionPane.showInputDialog("Qual é o seu CPF?");
+            } else {
+                cliente = new ClienteEstrangeiro();
+                ((ClienteEstrangeiro) cliente).passaporte = JOptionPane.showInputDialog("Qual é o número do seu passaporte?");
+            }
 
-        Transfer transfer1 = new Transfer();
-        transfer1.descricao = "Viagem do aeroporto até o hotel.";
-        transfer1.preco = 120.00;
-        transfer1.origem = "Aeroporto Santos Dumont";
-        transfer1.destino = "Hotel Ibis";
+            cliente.nome = JOptionPane.showInputDialog("Qual é o seu nome?");
+            cliente.telefone = JOptionPane.showInputDialog("Qual é o seu telefone?");
+            cliente.email = JOptionPane.showInputDialog("Qual é o seu email?");
+            clientes.add(cliente);
+    
 
-        Passeio passeio1 = new Passeio();
-        passeio1.descricao = "Um lindo passeio pelo Cristo Redentor.";
-        passeio1.preco = 500.00;
-        passeio1.duracaoHoras = 4;
-        passeio1.local = "Cristo Redentor e Mirante Dona Marta.";
+            JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso!");
+        } else if (escolha == 1) {
+            if (clientes.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Nenhum cliente cadastrado.");
+            } else {
+                StringBuilder lista = new StringBuilder();
+                int contador = 1;
+                for (Cliente c : clientes) {
+                    lista.append("Cliente " + contador + "\n Nome: ").append(c.nome).append(" \n Email: ").append(c.email).append("\n\n");
+                    contador++;
+                }
 
-        Reserva reserva1 = new Reserva(cliente1, pacote1, List.of(transfer1, passeio1));
-        reservasPorCliente.put(cliente1.nome, reserva1);
+                JOptionPane.showMessageDialog(null, lista.toString(), "Clientes", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
 
-        // Cliente 2
-        ClienteEstrangeiro cliente2 = new ClienteEstrangeiro();
-        cliente2.nome = "Juan Dinenno";
-        cliente2.telefone = "0000000000";
-        cliente2.email = "juan.dinenno@gmail.com";
-        cliente2.passaporte = "444333";
+    static void menuPacotes() {
+        if (clientes.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nenhum cliente cadastrado. Por favor, cadastre-se primeiro.");
+            menuClientes();
+            if (clientes.isEmpty()) return; // Ainda não cadastrou ninguém? Sai fora
+        }
 
-        PacoteViagem pacote2 = new PacoteViagem() {};
-        pacote2.nomePacote = "Pacote Disney";
-        pacote2.destino = "Orlando";
-        pacote2.duracaoDias = 10;
-        pacote2.precoBase = 25000.00;
-        pacote2.tipo = TipoPacote.AVENTURA;
+        // Escolha do cliente
+        String[] nomesClientes = new String[clientes.size()];
+        for (int i = 0; i < clientes.size(); i++) {
+            nomesClientes[i] = clientes.get(i).nome;
+        }
 
-        Reserva reserva2 = new Reserva(cliente2, pacote2, null);
-        reservasPorCliente.put(cliente2.nome, reserva2);
+        String nomeSelecionado = (String) JOptionPane.showInputDialog(
+                null,
+                "Selecione seu nome:",
+                "Identificação do Cliente",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                nomesClientes,
+                nomesClientes[0]
+        );
 
+        if (nomeSelecionado == null) return;
 
-        buscarReservaPorNomeCliente("Thaís da Mota");
-        buscarReservaPorNomeCliente("Juan Dinenno");
-        buscarReservaPorNomeCliente("Carlos Silva"); // Não existe
+        Cliente clienteSelecionado = null;
+        for (Cliente c : clientes) {
+            if (c.nome.equals(nomeSelecionado)) {
+                clienteSelecionado = c;
+                break;
+            }
+        }
+
+        if (clienteSelecionado == null) {
+            JOptionPane.showMessageDialog(null, "Cliente não encontrado.");
+            return;
+        }
+
+        // Seleção de pacote
+        Pacote[] opcoes = pacotes.toArray(new Pacote[0]);
+
+        Pacote selecionado = (Pacote) JOptionPane.showInputDialog(
+                null,
+                "Escolha um pacote:",
+                "Pacotes Disponíveis",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                opcoes,
+                opcoes[0]
+        );
+
+        if (selecionado == null) return;
+
+        String[] tipos = {
+            "Luxo (Aumenta o preço em 40%)",
+            "Aventura (Aumenta o preço em 20%)",
+            "Cultural (Aumenta o preço em 10%)",
+            "Padrão (Aumenta o preço em 0%)"
+        };
+
+        int tipo = JOptionPane.showOptionDialog(
+                null,
+                "Escolha o tipo do pacote:",
+                "Tipo do Pacote",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                tipos,
+                tipos[0]
+        );
+
+        if (tipo == -1) return;
+
+        int dias;
+        try {
+            dias = Integer.parseInt(JOptionPane.showInputDialog("Quantos dias de viagem?"));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Número de dias inválido.");
+            return;
+        }
+
+        double multiplicador = switch (tipo) {
+            case 0 -> 1.40;
+            case 1 -> 1.20;
+            case 2 -> 1.10;
+            case 3 -> 1.0;
+            default -> 1.0;
+        };
+
+        double valorFinal = (selecionado.valorPassagem + (selecionado.valorDiaria * dias)) * multiplicador;
+
+        JOptionPane.showMessageDialog(null,
+                "Resumo da Viagem:\n" +
+                "Cliente: " + clienteSelecionado.nome + "\n" +
+                "Destino: " + selecionado.destino + "\n" +
+                "Tipo: " + tipos[tipo] + "\n" +
+                "Dias: " + dias + "\n" +
+                "Valor Total: R$ " + String.format("%.2f", valorFinal));
     }
 }
