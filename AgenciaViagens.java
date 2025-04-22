@@ -4,39 +4,86 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-class Cliente {
+abstract class Cliente {
     String nome, telefone, email;
 }
 
-class ClienteNacional extends Cliente {
-    String cpf;
-}
+	class ClienteNacional extends Cliente {
+	    String cpf;
+	}
+	
+	class ClienteEstrangeiro extends Cliente {
+	    String passaporte;
+	}
 
-class ClienteEstrangeiro extends Cliente {
-    String passaporte;
-}
-
-class Pacote {
-    String nome, destino, tipo;
+abstract class Pacote {
+    String nome, destino;
     double valorPassagem, valorDiaria;
     int duracaoDias;
-    public Pacote(String nome, String destino, double passagem, double diaria, int duracaoDias, String tipo) {
+
+    public Pacote(String nome, String destino, double valorPassagem, double valorDiaria, int duracaoDias) {
         this.nome = nome;
         this.destino = destino;
-        this.valorPassagem = passagem;
-        this.valorDiaria = diaria;
+        this.valorPassagem = valorPassagem;
+        this.valorDiaria = valorDiaria;
         this.duracaoDias = duracaoDias;
-        this.tipo = tipo;
     }
 
+    public abstract String getTipo(); 
+
+    @Override
     public String toString() {
-        return nome + " - " + destino + " | Tipo: " + tipo +
-               " | Passagem: R$" + valorPassagem + " | Diária: R$" + valorDiaria +
+        return nome + " - " + destino +
+               " | Tipo: " + getTipo() +
+               " | Passagem: R$" + valorPassagem +
+               " | Diária: R$" + valorDiaria +
                " | Duração: " + duracaoDias + " dias";
     }
-
-
 }
+			class PacoteLuxo extends Pacote {
+			    public PacoteLuxo(String nome, String destino, double passagem, double diaria, int duracaoDias) {
+			        super(nome, destino, passagem, diaria, duracaoDias);
+			    }
+			
+			    @Override
+			    public String getTipo() {
+			        return "Luxo";
+			    }
+			}
+			
+			class PacoteCultural extends Pacote {
+			    public PacoteCultural(String nome, String destino, double passagem, double diaria, int duracaoDias) {
+			        super(nome, destino, passagem, diaria, duracaoDias);
+			    }
+			
+			    @Override
+			    public String getTipo() {
+			        return "Cultural";
+			    }
+			}
+			
+			class PacoteAventura extends Pacote {
+			    public PacoteAventura(String nome, String destino, double passagem, double diaria, int duracaoDias) {
+			        super(nome, destino, passagem, diaria, duracaoDias);
+			    }
+			
+			    @Override
+			    public String getTipo() {
+			        return "Aventura";
+			    }
+			}
+			
+			class PacotePadrao extends Pacote {
+			    public PacotePadrao(String nome, String destino, double passagem, double diaria, int duracaoDias) {
+			        super(nome, destino, passagem, diaria, duracaoDias);
+			    }
+			
+			    @Override
+			    public String getTipo() {
+			        return "Padrão";
+			    }
+			}
+
 
 class Reserva {
     Cliente cliente;
@@ -55,7 +102,7 @@ class Reserva {
     }
 }
 
-class ServicoAdicional {
+abstract class ServicoAdicional {
     String nome;
     double preco;
 
@@ -69,6 +116,24 @@ class ServicoAdicional {
     }
 }
 
+		class ServicoTranslado extends ServicoAdicional {
+		    public ServicoTranslado() {
+		        super("Translado aeroporto-hotel", 150.0);
+		    }
+		}
+		
+		class ServicoAcessoAcademia extends ServicoAdicional {
+		    public ServicoAcessoAcademia() {
+		        super("Acesso à Academia", 350.0);
+		    }
+		}
+		
+		class ServicoPersonalizado extends ServicoAdicional {
+		    public ServicoPersonalizado(String nome, double preco) {
+		        super(nome, preco);
+		    }
+		}
+
 public class AgenciaViagens {
     static List<Cliente> clientes = new ArrayList<>();
     static List<Pacote> pacotes = new ArrayList<>();
@@ -77,21 +142,22 @@ public class AgenciaViagens {
     static List<String> funcionarios = new ArrayList<>();
 
     public static void main(String[] args) {
-    	pacotes.add(new Pacote("Rio de Janeiro", "RJ", 5500, 6000, 5, "Luxo"));
-    	pacotes.add(new Pacote("Amazônia", "AM", 1200, 450, 4, "Aventura"));
-    	pacotes.add(new Pacote("Salvador", "BA", 900, 400, 6, "Cultural"));
-    	pacotes.add(new Pacote("Lençóis Maranhenses", "MA", 1000, 450, 7, "Aventura"));
-    	pacotes.add(new Pacote("São Paulo", "SP", 950, 400, 3, "Padrão"));
-    	pacotes.add(new Pacote("Brasília", "DF", 900, 550, 4, "Cultural"));
-    	pacotes.add(new Pacote("Belo Horizonte", "MG", 4200, 5200, 5, "Luxo"));
+    	// pacotes pré definidos.
+    	pacotes.add(new PacoteLuxo("Rio de Janeiro", "RJ", 5500, 6000, 5));
+    	pacotes.add(new PacoteAventura("Amazônia", "AM", 1200, 450, 4));
+    	pacotes.add(new PacoteCultural("Salvador", "BA", 900, 400, 6));
+    	pacotes.add(new PacoteAventura("Lençóis Maranhenses", "MA", 1000, 450, 7));
+    	pacotes.add(new PacotePadrao("São Paulo", "SP", 950, 400, 3));
+    	pacotes.add(new PacoteCultural("Brasília", "DF", 900, 550, 4));
+    	pacotes.add(new PacoteLuxo("Belo Horizonte", "MG", 4200, 5200, 5));
 
 
         funcionarios.add("admin:1234");
         if (!loginFuncionario()) return;
         
+        servicosAdicionais.add(new ServicoTranslado());
+        servicosAdicionais.add(new ServicoAcessoAcademia());
 
-        servicosAdicionais.add(new ServicoAdicional("Translado aeroporto-hotel", 150.0));
-		servicosAdicionais.add(new ServicoAdicional("Acesso à Academia", 350.0));
 
 
         while (true) {
@@ -106,11 +172,11 @@ public class AgenciaViagens {
         }
     }
 
-    static boolean loginFuncionario() {
-        String usuario = JOptionPane.showInputDialog("Usuário:");
-        String senha = JOptionPane.showInputDialog("Senha:");
-        return funcionarios.stream().anyMatch(f -> f.equals(usuario + ":" + senha));
-    }
+	    static boolean loginFuncionario() {
+	        String usuario = JOptionPane.showInputDialog("Usuário:");
+	        String senha = JOptionPane.showInputDialog("Senha:");
+	        return funcionarios.stream().anyMatch(f -> f.equals(usuario + ":" + senha));
+	    }
 
     static void menuClientes() {
         String[] opcoes = {"Cadastrar", "Visualizar", "Buscar", "Excluir", "Ver Pacotes Contratados", "Voltar"};
@@ -155,8 +221,21 @@ public class AgenciaViagens {
 
     static void incluirServico() {
         String nome = JOptionPane.showInputDialog("Nome do serviço:");
-        double preco = Double.parseDouble(JOptionPane.showInputDialog("Preço do serviço:"));
-        servicosAdicionais.add(new ServicoAdicional(nome, preco));
+        if (nome == null || nome.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nome obrigatório.");
+            return;
+        }
+
+        String precoStr = JOptionPane.showInputDialog("Preço do serviço:");
+        double preco;
+        try {
+            preco = Double.parseDouble(precoStr);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Preço inválido.");
+            return;
+        }
+
+        servicosAdicionais.add(new ServicoPersonalizado(nome, preco));
         JOptionPane.showMessageDialog(null, "Serviço adicionado com sucesso!");
     }
 
@@ -348,7 +427,7 @@ public class AgenciaViagens {
             lista.append(i++)
                  .append(". ")
                  .append(p.nome).append(" - ").append(p.destino)
-                 .append(" | Tipo: ").append(p.tipo)
+                 .append(" | Tipo: ").append(p.getTipo())
                  .append(" | Passagem: R$").append(p.valorPassagem)
                  .append(" | Diária: R$").append(p.valorDiaria)
                  .append(" | Duração: ").append(p.duracaoDias).append(" dias")
@@ -357,6 +436,7 @@ public class AgenciaViagens {
 
         JOptionPane.showMessageDialog(null, lista.toString());
     }
+
 
     
     static void tipoDetalhes() {
@@ -422,13 +502,13 @@ public class AgenciaViagens {
     	}
 
     	String[] nomes = pacotes.stream()
-    	    .map(p -> p.nome + " (" + p.tipo + ")")
+    	    .map(p -> p.nome + " (" + p.getTipo() + ")")
     	    .toArray(String[]::new);
 
     	String nomeSelecionado = (String) JOptionPane.showInputDialog(null, "Selecione o pacote:", "Excluir Pacote", JOptionPane.PLAIN_MESSAGE, null, nomes, nomes[0]);
 
     	Pacote p = pacotes.stream()
-    	    .filter(pa -> (pa.nome + " (" + pa.tipo + ")").equals(nomeSelecionado))
+    	    .filter(pa -> (pa.nome + " (" + pa.getTipo() + ")").equals(nomeSelecionado))
     	    .findFirst().orElse(null);
 
     	if (p == null) return;
@@ -505,7 +585,15 @@ public class AgenciaViagens {
             return;
         }
         
-        pacotes.add(new Pacote(nome, destino, passagem, diaria, duracaoDias, tipo));
+        Pacote novoPacote;
+        switch (tipo) {
+            case "Luxo" -> novoPacote = new PacoteLuxo(nome, destino, passagem, diaria, duracaoDias);
+            case "Cultural" -> novoPacote = new PacoteCultural(nome, destino, passagem, diaria, duracaoDias);
+            case "Aventura" -> novoPacote = new PacoteAventura(nome, destino, passagem, diaria, duracaoDias);
+            default -> novoPacote = new PacotePadrao(nome, destino, passagem, diaria, duracaoDias);
+        }
+        pacotes.add(novoPacote);
+
         JOptionPane.showMessageDialog(null, "Pacote adicionado com sucesso!");
     }
 
@@ -525,8 +613,9 @@ public class AgenciaViagens {
         Cliente c = clientes.stream().filter(cl -> cl.nome.equals(nome)).findFirst().orElse(null);
         if (c == null) return;
         String[] nomesPacotes = pacotes.stream()
-                .map(pac -> pac.nome + " (" + pac.tipo + ")")
-                .toArray(String[]::new);
+        	    .map(pac -> pac.nome + " (" + pac.getTipo() + ")")
+        	    .toArray(String[]::new);
+
 
         String nomePacoteSelecionado = (String) JOptionPane.showInputDialog(
                 null,
@@ -539,9 +628,10 @@ public class AgenciaViagens {
         );
 
         Pacote p = pacotes.stream()
-                .filter(pa -> (pa.nome + " (" + pa.tipo + ")").equals(nomePacoteSelecionado))
-                .findFirst()
-                .orElse(null);
+        	    .filter(pa -> (pa.nome + " (" + pa.getTipo() + ")").equals(nomePacoteSelecionado))
+        	    .findFirst()
+        	    .orElse(null);
+
 
         if (p == null) return;
 
