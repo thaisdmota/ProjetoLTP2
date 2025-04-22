@@ -321,7 +321,7 @@ public class AgenciaViagens {
             String passaporte;
             do {
                 passaporte = JOptionPane.showInputDialog("Passaporte:");
-                if (passaporte == null) return; // Cancelado
+                if (passaporte == null) return; 
                 if (passaporte.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "O número do passaporte é obrigatório.");
                     passaporte = null;
@@ -339,6 +339,11 @@ public class AgenciaViagens {
         String telefone = JOptionPane.showInputDialog("Telefone:");
         if (telefone == null || telefone.trim().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Telefone é obrigatório.");
+            return;
+        }
+        if (!telefone.matches("\\d+")) {
+            JOptionPane.showMessageDialog(null, "Telefone deve ser apenas números.");
+            telefone = null;
             return;
         }
 
