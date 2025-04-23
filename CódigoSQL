@@ -29,7 +29,7 @@ CREATE TABLE pacotes (
     duracao_dias INT NOT NULL
 );
 INSERT INTO pacotes (nome, destino, tipo, valor_passagem, valor_diaria, duracao_dias)
-VALUES
+VALUES 
 ('Rio de Janeiro', 'RJ', 'LUXO', 5500.00, 6000.00, 5),
 ('Amazônia', 'AM', 'AVENTURA', 1200.00, 450.00, 4),
 ('Salvador', 'BA', 'CULTURAL', 900.00, 400.00, 6),
@@ -77,3 +77,15 @@ CREATE TABLE funcionarios (
     usuario VARCHAR(50) NOT NULL UNIQUE,
     senha VARCHAR(100) NOT NULL
 );
+
+ALTER TABLE servicos_adicionais ADD COLUMN tipo VARCHAR(50);
+Select * from clientes;
+
+Select * from pacotes;
+
+Select * from servicos_adicionais;
+select * from reservas;
+
+ALTER TABLE reservas DROP COLUMN cliente_nome;
+ALTER TABLE servicos_adicionais ADD COLUMN tipo VARCHAR(50);
+
