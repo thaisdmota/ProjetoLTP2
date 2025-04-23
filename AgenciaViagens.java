@@ -271,7 +271,7 @@ public class AgenciaViagens {
         try (Connection conn = DatabaseConnection.getConnection()) {
             String sql = "SELECT nome, preco FROM servicos_adicionais WHERE LOWER(nome) LIKE ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, "%" + nomeBusca.toLowerCase() + "%");
+                stmt.setString(1, nomeBusca.toLowerCase() + "%"); // 👈 começa com
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         res.append(rs.getString("nome"))
@@ -288,7 +288,6 @@ public class AgenciaViagens {
 
         JOptionPane.showMessageDialog(null, res.length() > 0 ? res.toString() : "Serviço não encontrado.");
     }
-
 
     static void excluirServico() {
         List<String> nomesServicos = new ArrayList<>();
@@ -362,7 +361,7 @@ public class AgenciaViagens {
                     lista.append("Reserva ").append(i++)
                           .append("\nCliente: ").append(rs.getString("cliente_nome"))
                           .append("\nPacote: ").append(rs.getString("pacote_nome"))
-                          .append("\nValor: R$").append(rs.getDouble("valor_final"))
+                          .append("\nValor total: R$").append(rs.getDouble("valor_final"))
                           .append("\n\n");
                 }
             }
@@ -580,7 +579,6 @@ public class AgenciaViagens {
         }
     }
 
-
     static void visualizarPacotesCliente() {
         String nomeCliente = JOptionPane.showInputDialog("Digite o nome do cliente:");
         if (nomeCliente == null || nomeCliente.trim().isEmpty()) return;
@@ -589,15 +587,17 @@ public class AgenciaViagens {
 
         try (Connection conn = DatabaseConnection.getConnection()) {
 
-            // Buscar ID do cliente pelo nome
-            String sqlCliente = "SELECT id FROM clientes WHERE nome = ?";
-            int clienteId;
+            // Buscar ID do cliente pelo início do nome
+            String sqlCliente = "SELECT id, nome FROM clientes WHERE LOWER(nome) LIKE ?";
+            int clienteId = -1;
+            String nomeCompleto = null;
 
             try (PreparedStatement stmt = conn.prepareStatement(sqlCliente)) {
-                stmt.setString(1, nomeCliente);
+                stmt.setString(1, nomeCliente.toLowerCase() + "%");
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         clienteId = rs.getInt("id");
+                        nomeCompleto = rs.getString("nome");
                     } else {
                         JOptionPane.showMessageDialog(null, "Cliente não encontrado.");
                         return;
@@ -617,10 +617,9 @@ public class AgenciaViagens {
                 stmt.setInt(1, clienteId);
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
-                        pacotesCliente.append("Pacote: ")
-                                .append(rs.getString("pacote_nome"))
-                                .append("\nValor: R$")
-                                .append(rs.getDouble("valor_final"))
+                        pacotesCliente.append("Cliente: ").append(nomeCompleto).append("\n")
+                                .append("Pacote: ").append(rs.getString("pacote_nome"))
+                                .append("\nValor: R$").append(rs.getDouble("valor_final"))
                                 .append("\n\n");
                     }
                 }
@@ -637,7 +636,6 @@ public class AgenciaViagens {
             JOptionPane.showMessageDialog(null, pacotesCliente.toString());
         }
     }
-
 
     static void visualizarPacotes() {
         StringBuilder lista = new StringBuilder();
@@ -710,7 +708,7 @@ public class AgenciaViagens {
         try (Connection conn = DatabaseConnection.getConnection()) {
             String sqlPacote = "SELECT id, nome, destino, tipo, valor_passagem, valor_diaria, duracao_dias FROM pacotes WHERE LOWER(nome) LIKE ?";
             try (PreparedStatement stmt = conn.prepareStatement(sqlPacote)) {
-                stmt.setString(1, "%" + nomePacote.toLowerCase() + "%");
+                stmt.setString(1, nomePacote.toLowerCase() + "%"); // 👈 começa com
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
@@ -723,7 +721,7 @@ public class AgenciaViagens {
                            .append(" | Diária: R$").append(rs.getDouble("valor_diaria"))
                            .append(" | Duração: ").append(rs.getInt("duracao_dias")).append(" dias\n");
 
-                        // Buscar clientes que contrataram esse pacote
+                        // Buscar clientes que contrataram este pacote
                         String sqlClientes = "SELECT c.nome FROM reservas r " +
                                              "JOIN clientes c ON r.cliente_id = c.id " +
                                              "WHERE r.pacote_id = ?";
@@ -753,8 +751,6 @@ public class AgenciaViagens {
 
         JOptionPane.showMessageDialog(null, res.length() > 0 ? res.toString() : "Pacote não encontrado.");
     }
-
-
 
     static void excluirPacote() {
         List<String> nomesPacotes = new ArrayList<>();
