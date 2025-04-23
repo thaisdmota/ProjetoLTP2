@@ -358,10 +358,38 @@ public class AgenciaViagens {
 
                 int i = 1;
                 while (rs.next()) {
+                    int reservaId = rs.getInt("id");
+                    String cliente = rs.getString("cliente_nome");
+                    String pacote = rs.getString("pacote_nome");
+                    double valor = rs.getDouble("valor_final");
+
+                    // Buscar serviços adicionais dessa reserva
+                    StringBuilder servicos = new StringBuilder();
+                    String sqlServicos = """
+                        SELECT sa.nome FROM reserva_servicos rs
+                        JOIN servicos_adicionais sa ON rs.servico_id = sa.id
+                        WHERE rs.reserva_id = ?
+                    """;
+                    try (PreparedStatement stmtServ = conn.prepareStatement(sqlServicos)) {
+                        stmtServ.setInt(1, reservaId);
+                        try (ResultSet rsServ = stmtServ.executeQuery()) {
+                            List<String> servicosList = new ArrayList<>();
+                            while (rsServ.next()) {
+                                servicosList.add(rsServ.getString("nome"));
+                            }
+                            if (!servicosList.isEmpty()) {
+                                servicos.append("Serviços: ").append(String.join(", ", servicosList));
+                            } else {
+                                servicos.append("Serviços: Nenhum");
+                            }
+                        }
+                    }
+
                     lista.append("Reserva ").append(i++)
-                          .append("\nCliente: ").append(rs.getString("cliente_nome"))
-                          .append("\nPacote: ").append(rs.getString("pacote_nome"))
-                          .append("\nValor total: R$").append(rs.getDouble("valor_final"))
+                          .append("\nCliente: ").append(cliente)
+                          .append("\nPacote: ").append(pacote)
+                          .append("\n").append(servicos)
+                          .append("\nValor total: R$").append(valor)
                           .append("\n\n");
                 }
             }
@@ -374,9 +402,16 @@ public class AgenciaViagens {
         if (lista.length() == 0) {
             JOptionPane.showMessageDialog(null, "Nenhuma reserva realizada.");
         } else {
-            JOptionPane.showMessageDialog(null, lista.toString());
+            JTextArea textArea = new JTextArea(lista.toString());
+            textArea.setEditable(false);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new java.awt.Dimension(500, 400)); // Define tamanho da janela com rolagem
+            JOptionPane.showMessageDialog(null, scrollPane, "Reservas", JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
+
+
 
     static void cadastrarCliente() {
         String[] tipoCliente = {"Nacional", "Estrangeiro"};
@@ -467,7 +502,7 @@ public class AgenciaViagens {
                 String passaporte = rs.getString("passaporte");
 
                 lista.append("Cliente ").append(i++).append("\nNome: ").append(nome)
-                        .append("\nEmail: ").append(email);
+                     .append("\nEmail: ").append(email);
 
                 if ("NACIONAL".equalsIgnoreCase(tipo)) {
                     lista.append("\nCPF: ").append(cpf);
@@ -477,18 +512,22 @@ public class AgenciaViagens {
                 lista.append("\n\n");
             }
 
-            if (lista.length() == 0) {
-                JOptionPane.showMessageDialog(null, "Nenhum cliente cadastrado.");
-            } else {
-                JOptionPane.showMessageDialog(null, lista.toString());
-            }
-
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Erro ao buscar clientes: " + e.getMessage());
             e.printStackTrace();
+            return;
+        }
+
+        if (lista.length() == 0) {
+            JOptionPane.showMessageDialog(null, "Nenhum cliente cadastrado.");
+        } else {
+            JTextArea textArea = new JTextArea(lista.toString());
+            textArea.setEditable(false);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new java.awt.Dimension(500, 400));
+            JOptionPane.showMessageDialog(null, scrollPane, "Clientes", JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
 
     static void buscarCliente() {
         String nomeBusca = JOptionPane.showInputDialog("Nome do cliente:");
@@ -665,11 +704,13 @@ public class AgenciaViagens {
         if (lista.length() == 0) {
             JOptionPane.showMessageDialog(null, "Nenhum pacote disponível.");
         } else {
-            JOptionPane.showMessageDialog(null, lista.toString());
+            JTextArea textArea = new JTextArea(lista.toString());
+            textArea.setEditable(false);
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new java.awt.Dimension(500, 400));
+            JOptionPane.showMessageDialog(null, scrollPane, "Pacotes Disponíveis", JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
-
 
     
     static void tipoDetalhes() {
