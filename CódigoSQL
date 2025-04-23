@@ -86,6 +86,4 @@ Select * from pacotes;
 Select * from servicos_adicionais;
 select * from reservas;
 
-ALTER TABLE reservas DROP COLUMN cliente_nome;
-ALTER TABLE servicos_adicionais ADD COLUMN tipo VARCHAR(50);
 
